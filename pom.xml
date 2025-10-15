@@ -120,20 +120,6 @@
 			<version>2.2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>br.com.generic.logformatter</groupId>
-			<artifactId>generic.logformatter</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/generic.logformatter.jar</systemPath>
-		</dependency>
-		<dependency>
-				<groupId>br.com.generic</groupId>
-				<artifactId>generic.security</artifactId>
-				<version>1.0.0</version>
-				<scope>system</scope>
-				<systemPath>${project.basedir}/libs/generic.security.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
 			<version>0.10.7</version>
@@ -147,6 +133,11 @@
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
 			<version>1.11.163</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.10.1</version>
 		</dependency>
 	</dependencies>
 
@@ -192,14 +183,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal> <!-- ESSENCIAL -->
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
