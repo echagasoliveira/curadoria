@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@PropertySource("classpath:security.properties")
+@PropertySource("classpath:application.properties")
 @Order(1)
 public class SecurityConfig {
 

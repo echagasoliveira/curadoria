@@ -10,8 +10,10 @@ import org.springframework.context.annotation.PropertySource;
 @EnableFeignClients
 @PropertySource("classpath:application.properties")
 @ImportAutoConfiguration({ FeignAutoConfiguration.class })
-@SpringBootApplication(scanBasePackages = { "br.com.generic.logformatter", "br.com.curadoria",
-		"br.com.generic.security" })
+@SpringBootApplication(scanBasePackages = {"br.com.generic.logformatter",
+		"br.com.curadoria",
+		"br.com.generic.security"
+		})
 public class CuradoriaApplication {
 
 	public static void main(String[] args) {
