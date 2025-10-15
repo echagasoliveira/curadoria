@@ -8,8 +8,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17
 WORKDIR /app
 
-#RUN mkdir -p /lib
-#COPY lib/*.jar /lib/
+RUN mkdir -p /libs
+COPY libs/*.jar /libs/
 
 COPY --from=builder /app/target/curadoria-0.0.1-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
