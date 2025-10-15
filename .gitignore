@@ -1,0 +1,33 @@
+# Ignore a pasta de build do Maven
+target/
+
+# Ignore arquivos .jar/.war gerados
+*.jar
+*.war
+
+# IDEs - IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# IDEs - Eclipse
+.classpath
+.project
+.settings/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.swp
+
+# Variáveis de ambiente locais
+.env
+.env.*
