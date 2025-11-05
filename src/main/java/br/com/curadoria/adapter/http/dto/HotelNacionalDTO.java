@@ -37,5 +37,5 @@ public class HotelNacionalDTO {
 	private List<RegimeAlimentacaoDTO> regimesAlimentacaoDTO;
 
 	@JsonProperty("palavra_chave")
-	private List<PalavraChaveDTO> palavrasChaveDTO;
+	private String palavrasChaves;
 }

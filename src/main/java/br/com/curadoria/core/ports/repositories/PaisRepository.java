@@ -10,7 +10,7 @@ public interface PaisRepository extends JpaRepository<Pais, Integer> {
     List<Pais> findAll();
 
     @Query(nativeQuery = true, value = """
-            SELECT tb_pais.id, tb_pais.sigla2, tb_pais.sigla3, tb_pais.nome
+            SELECT tb_pais.id_continente, tb_pais.id, tb_pais.sigla2, tb_pais.sigla3, tb_pais.nome
                     FROM tb_pais
                     WHERE exists (select 1
                             from tb_municipio
@@ -21,7 +21,7 @@ public interface PaisRepository extends JpaRepository<Pais, Integer> {
     List<Pais> findPaisComMunicipio();
 
     @Query(nativeQuery = true, value = """
-            SELECT tb_pais.id, tb_pais.sigla2, tb_pais.sigla3, tb_pais.nome
+            SELECT tb_pais.id_continente, tb_pais.id, tb_pais.sigla2, tb_pais.sigla3, tb_pais.nome
                     FROM tb_pais
                     WHERE exists (select 1
                         from tb_hotel_internacional, tb_municipio

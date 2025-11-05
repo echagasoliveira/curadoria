@@ -37,8 +37,8 @@ public class HotelNacionalService {
     @Autowired
     private HotelNacionalMapper mapper;
 
-    public List<HotelNacionalDTO> searchHoteisNacionais(Integer idEstado, Integer idMunicipio, Integer idRegimeAlimentacao, Integer idPalavraChave) {
-        List<HotelNacional> hoteisNacionais = hotelNacionalRepository.searchHoteisNacionais(idEstado, idMunicipio, idRegimeAlimentacao, idPalavraChave);
+    public List<HotelNacionalDTO> searchHoteisNacionais(Integer idEstado, Integer idMunicipio, Integer idRegimeAlimentacao, String palavraChave) {
+        List<HotelNacional> hoteisNacionais = hotelNacionalRepository.searchHoteisNacionais(idEstado, idMunicipio, idRegimeAlimentacao, palavraChave);
         return mapper.mapAll(hoteisNacionais.stream().filter(distinctByKey(HotelNacional::getId)).collect(Collectors.toList()));
     }
 
@@ -60,16 +60,10 @@ public class HotelNacionalService {
                         .map(id -> RegimeAlimentacao.builder().id(id).build())
                         .collect(Collectors.toList());
 
-        List<PalavraChave> palavras = hotelNacionalRequestDTO.getIdsPalavraChave() == null ?
-                new ArrayList<>() :
-                hotelNacionalRequestDTO.getIdsPalavraChave().stream()
-                        .map(id -> PalavraChave.builder().id(id).build())
-                        .collect(Collectors.toList());
-
         HotelNacional hotelNacional = HotelNacional.builder()
                 .municipio(municipioOptional.get())
                 .regimesAlimentacao(regimes)
-                .palavrasChaves(palavras)
+                .palavrasChaves(hotelNacionalRequestDTO.getPalavrasChave())
                 .nome(hotelNacionalRequestDTO.getNome())
                 .url(hotelNacionalRequestDTO.getUrl())
                 .ativo(true)
@@ -90,18 +84,18 @@ public class HotelNacionalService {
                         .map(id -> RegimeAlimentacao.builder().id(id).build())
                         .collect(Collectors.toList());
 
-        List<PalavraChave> palavras = hotelNacionalRequestDTO.getIdsPalavraChave() == null ?
+        /*List<PalavraChave> palavras = hotelNacionalRequestDTO.getIdsPalavraChave() == null ?
                 new ArrayList<>() :
                 hotelNacionalRequestDTO.getIdsPalavraChave().stream()
                         .map(id -> PalavraChave.builder().id(id).build())
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
 
         HotelNacional hotelNacional = hotelNacionalRepository.findById(hotelNacionalRequestDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Hotel nacional não encontrado. Favor tentar novamente mais tarde."));
 
         hotelNacional.setMunicipio(municipioOptional.get());
         hotelNacional.setRegimesAlimentacao(regimes);
-        hotelNacional.setPalavrasChaves(palavras);
+        hotelNacional.setPalavrasChaves(hotelNacionalRequestDTO.getPalavrasChave());
         hotelNacional.setNome(hotelNacionalRequestDTO.getNome());
         hotelNacional.setAtivo(hotelNacionalRequestDTO.getAtivo());
         hotelNacional.setUrl(hotelNacionalRequestDTO.getUrl());

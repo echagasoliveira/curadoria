@@ -33,6 +33,10 @@ public class Pais implements Serializable {
 	@Column(unique = true)
 	private String nome;
 
+	@ManyToOne
+	@JoinColumn(name = "id_continente")
+	private Continente continente;
+
 	@OneToMany(mappedBy = "pais", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private Set<Municipio> municipios = new HashSet<>();

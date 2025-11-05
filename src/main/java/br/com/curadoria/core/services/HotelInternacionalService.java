@@ -34,8 +34,8 @@ public class HotelInternacionalService {
     @Autowired
     private PaisRepository paisRepository;
 
-    public List<HotelInternacionalDTO> searchHoteisInternacionais(Integer idPais, Integer idMunicipio, Integer idRegimeAlimentacao, Integer idPalavraChave){
-        List<HotelInternacional> hoteisInternacionais = hotelInternacionalRepository.searchHoteisInternacionais(idPais, idMunicipio, idRegimeAlimentacao, idPalavraChave);
+    public List<HotelInternacionalDTO> searchHoteisInternacionais(Integer idPais, Integer idMunicipio, Integer idRegimeAlimentacao, String palavraChave){
+        List<HotelInternacional> hoteisInternacionais = hotelInternacionalRepository.searchHoteisInternacionais(idPais, idMunicipio, idRegimeAlimentacao, palavraChave);
         return mapper.mapAll(hoteisInternacionais.stream().filter(distinctByKey(HotelInternacional::getId)).collect(Collectors.toList()));
     }
 
@@ -67,16 +67,16 @@ public class HotelInternacionalService {
                         .map(id -> RegimeAlimentacao.builder().id(id).build())
                         .collect(Collectors.toList());
 
-        List<PalavraChave> palavras = hotelInternacionalRequestDTO.getIdsPalavraChave() == null ?
+        /*List<PalavraChave> palavras = hotelInternacionalRequestDTO.getIdsPalavraChave() == null ?
                 new ArrayList<>() :
                 hotelInternacionalRequestDTO.getIdsPalavraChave().stream()
                         .map(id -> PalavraChave.builder().id(id).build())
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
 
         HotelInternacional hotelInternacional = HotelInternacional.builder()
                 .municipio(municipio)
                 .regimesAlimentacao(regimes)
-                .palavrasChaves(palavras)
+                .palavrasChaves(hotelInternacionalRequestDTO.getPalavrasChave())
                 .nome(hotelInternacionalRequestDTO.getNome())
                 .url(hotelInternacionalRequestDTO.getUrl())
                 .ativo(true)
@@ -107,11 +107,11 @@ public class HotelInternacionalService {
                         .map(id -> RegimeAlimentacao.builder().id(id).build())
                         .collect(Collectors.toList());
 
-        List<PalavraChave> palavras = hotelInternacionalRequestDTO.getIdsPalavraChave() == null ?
+        /*List<PalavraChave> palavras = hotelInternacionalRequestDTO.getIdsPalavraChave() == null ?
                 new ArrayList<>() :
                 hotelInternacionalRequestDTO.getIdsPalavraChave().stream()
                         .map(id -> PalavraChave.builder().id(id).build())
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList());*/
 
 
         HotelInternacional hotelInternacional = hotelInternacionalRepository.findById(hotelInternacionalRequestDTO.getId())
@@ -119,7 +119,7 @@ public class HotelInternacionalService {
 
         hotelInternacional.setMunicipio(municipio);
         hotelInternacional.setRegimesAlimentacao(regimes);
-        hotelInternacional.setPalavrasChaves(palavras);
+        hotelInternacional.setPalavrasChaves(hotelInternacionalRequestDTO.getPalavrasChave());
         hotelInternacional.setNome(hotelInternacionalRequestDTO.getNome());
         hotelInternacional.setAtivo(hotelInternacionalRequestDTO.getAtivo());
 

@@ -26,8 +26,8 @@ public class HotelController {
     public ResponseEntity<RestResult<List<HotelNacionalDTO>>> getHoteisNacionais(@RequestParam(name = "id_estado", required = false) Integer idEstado,
                                                                                  @RequestParam(name = "id_municipio", required = false) Integer idMunicipio,
                                                                         @RequestParam(name = "id_regime_alimentacao", required = false) Integer idRegimeAlimentacao,
-                                                                        @RequestParam(name = "id_palavra_chave", required = false) Integer idPalavraChave) {
-        List<HotelNacionalDTO> dto = serviceHotelNacional.searchHoteisNacionais(idEstado, idMunicipio, idRegimeAlimentacao, idPalavraChave);
+                                                                        @RequestParam(name = "palavra_chave", required = false) String palavraChave) {
+        List<HotelNacionalDTO> dto = serviceHotelNacional.searchHoteisNacionais(idEstado, idMunicipio, idRegimeAlimentacao, palavraChave);
         return ResponseEntity.ok(new RestResult<>(dto));
     }
 
@@ -35,8 +35,8 @@ public class HotelController {
     public ResponseEntity<RestResult<List<HotelInternacionalDTO>>> getHoteisInternacionais(@RequestParam(name = "id_pais", required = false) Integer idPais,
                                                                                  @RequestParam(name = "id_municipio", required = false) Integer idMunicipio,
                                                                                  @RequestParam(name = "id_regime_alimentacao", required = false) Integer idRegimeAlimentacao,
-                                                                                 @RequestParam(name = "id_palavra_chave", required = false) Integer idPalavraChave) {
-        List<HotelInternacionalDTO> dto = serviceHotelInternacional.searchHoteisInternacionais(idPais, idMunicipio, idRegimeAlimentacao, idPalavraChave);
+                                                                                 @RequestParam(name = "palavra_chave", required = false) String palavraChave) {
+        List<HotelInternacionalDTO> dto = serviceHotelInternacional.searchHoteisInternacionais(idPais, idMunicipio, idRegimeAlimentacao, palavraChave);
         return ResponseEntity.ok(new RestResult<>(dto));
     }
 

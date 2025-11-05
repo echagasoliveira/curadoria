@@ -37,11 +37,14 @@ public class HotelNacional implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "id_regime_alimentacao"))
     private List<RegimeAlimentacao> regimesAlimentacao = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    /*@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tb_hotel_nacional_palavra_chave",
             joinColumns = @JoinColumn(name = "id_hotel_nacional"),
             inverseJoinColumns = @JoinColumn(name = "id_palavra_chave"))
-    private List<PalavraChave> palavrasChaves = new ArrayList<>();
+    private List<PalavraChave> palavrasChaves = new ArrayList<>();*/
+
+    @Column(name = "palavras_chave")
+    private String palavrasChaves;
 
     @Column(name = "url")
     private String url;

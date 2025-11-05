@@ -21,7 +21,7 @@ public interface HotelNacionalMapper {
             @Mapping(source = "municipio.estado.id", target = "idEstado"),
             @Mapping(source = "municipio.estado.uf", target = "uf"),
             @Mapping(source = "regimesAlimentacao", target = "regimesAlimentacaoDTO"),
-            @Mapping(source = "palavrasChaves", target = "palavrasChaveDTO")
+            @Mapping(source = "palavrasChaves", target = "palavrasChaves")
     })
     HotelNacionalDTO mapToDTO(HotelNacional estado);
 

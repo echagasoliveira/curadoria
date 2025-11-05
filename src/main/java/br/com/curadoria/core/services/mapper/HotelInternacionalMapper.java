@@ -19,10 +19,11 @@ public interface HotelInternacionalMapper {
             @Mapping(source = "municipio.nome", target = "nomeMunicipio"),
             @Mapping(source = "municipio.pais.id", target = "idPais"),
             @Mapping(source = "municipio.pais.nome", target = "nomePais"),
+            @Mapping(source = "municipio.pais.continente.nome", target = "nomeContinente"),
             @Mapping(source = "regimesAlimentacao", target = "regimesAlimentacaoDTO"),
-            @Mapping(source = "palavrasChaves", target = "palavrasChaveDTO")
+            @Mapping(source = "palavrasChaves", target = "palavrasChaves")
     })
-    HotelInternacionalDTO mapToDTO(HotelInternacional estado);
+    HotelInternacionalDTO mapToDTO(HotelInternacional hotelInternacional);
 
     List<HotelInternacionalDTO> mapAll(List<HotelInternacional> entity);
 }

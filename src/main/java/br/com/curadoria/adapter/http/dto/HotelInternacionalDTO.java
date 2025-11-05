@@ -33,9 +33,12 @@ public class HotelInternacionalDTO {
 	@JsonProperty("nome_pais")
 	private String nomePais;
 
+	@JsonProperty("nome_continente")
+	private String nomeContinente;
+
 	@JsonProperty("regime_alimentacao")
 	private List<RegimeAlimentacaoDTO> regimesAlimentacaoDTO;
 
 	@JsonProperty("palavra_chave")
-	private List<PalavraChaveDTO> palavrasChaveDTO;
+	private String palavrasChaves;
 }

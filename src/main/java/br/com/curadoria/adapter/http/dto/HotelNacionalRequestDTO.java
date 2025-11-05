@@ -33,9 +33,8 @@ public class HotelNacionalRequestDTO {
 	@JsonProperty("ids_regime_alimentacao")
 	private List<Integer> idsRegimeAlimentacao;
 
-	@NotEmpty(message = "A lista de identificadores de palavra chave não pode estar vazia.")
-	@JsonProperty("ids_palavra_chave")
-	private List<Integer> idsPalavraChave;
+	@JsonProperty("palavras_chave")
+	private String palavrasChave;
 
 	@JsonProperty("url")
 	private String url;
