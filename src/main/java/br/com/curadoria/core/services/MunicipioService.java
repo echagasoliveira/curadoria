@@ -1,8 +1,11 @@
 package br.com.curadoria.core.services;
 
 import br.com.curadoria.adapter.http.dto.MunicipioDTO;
+import br.com.curadoria.core.entities.HotelNacional;
 import br.com.curadoria.core.entities.Municipio;
+import br.com.curadoria.core.entities.Pais;
 import br.com.curadoria.core.ports.repositories.MunicipioRepository;
+import br.com.curadoria.core.ports.repositories.PaisRepository;
 import br.com.curadoria.core.services.mapper.MunicipioMapper;
 import br.com.curadoria.core.services.mapper.PaisMapper;
 import lombok.AllArgsConstructor;
@@ -18,6 +21,9 @@ public class MunicipioService {
     public static final Integer ID_BRASIL = 76;
     @Autowired
     private MunicipioRepository municipioRepository;
+
+    @Autowired
+    private PaisRepository paisRepository;
 
     @Autowired
     private MunicipioMapper mapper;
@@ -37,5 +43,35 @@ public class MunicipioService {
             else
                 return mapper.mapAll(municipioRepository.findByEstadoId(idEstado));
         }
+    }
+
+    public void postMunicipioInternacional(MunicipioDTO municipioDTO){
+        Optional<Pais> optionalPais = paisRepository.findById(municipioDTO.getIdPais());
+
+        if(!optionalPais.isPresent())
+            throw new RuntimeException("País não encontrado. Favor tentar novamente mais tarde.");
+
+        Municipio municipio = Municipio.builder()
+                .pais(optionalPais.get())
+                .nome(municipioDTO.getNome())
+                .capital(false)
+                .build();
+        municipioRepository.save(municipio);
+    }
+
+    public void putMunicipioInternacional(MunicipioDTO municipioDTO){
+        Optional<Pais> optionalPais = paisRepository.findById(municipioDTO.getIdPais());
+
+        if(!optionalPais.isPresent())
+            throw new RuntimeException("País não encontrado. Favor tentar novamente mais tarde.");
+
+        Municipio municipio = municipioRepository.findById(municipioDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Município não encontrado. Favor tentar novamente mais tarde."));
+
+        municipio.setPais(optionalPais.get());
+        municipio.setNome(municipioDTO.getNome());
+        municipio.setCapital(false);
+
+        municipioRepository.save(municipio);
     }
 }
