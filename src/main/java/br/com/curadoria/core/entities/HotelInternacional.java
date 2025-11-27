@@ -18,8 +18,7 @@ import java.util.List;
 @Table(name = "tb_hotel_internacional")
 public class HotelInternacional implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_internacional_seq")
-    @SequenceGenerator(name = "hotel_internacional_seq", sequenceName = "tb_hotel_internacional_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne

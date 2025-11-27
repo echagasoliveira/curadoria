@@ -20,8 +20,7 @@ import java.util.Set;
 @Table(name = "tb_hotel_nacional")
 public class HotelNacional implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_nacional_seq")
-    @SequenceGenerator(name = "hotel_nacional_seq", sequenceName = "tb_hotel_nacional_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
