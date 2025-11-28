@@ -99,7 +99,7 @@ public class HotelNacionalService {
         hotelNacional.setNome(hotelNacionalRequestDTO.getNome());
         hotelNacional.setAtivo(hotelNacionalRequestDTO.getAtivo());
         hotelNacional.setUrl(hotelNacionalRequestDTO.getUrl());
-        hotelNacional.setAtivo(true);
+        hotelNacional.setAtivo(hotelNacionalRequestDTO.getAtivo());
         hotelNacionalRepository.save(hotelNacional);
     }
 }
