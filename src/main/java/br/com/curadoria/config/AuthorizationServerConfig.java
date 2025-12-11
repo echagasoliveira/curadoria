@@ -39,12 +39,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
-import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
-import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2AccessTokenGenerator;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.JWKSet;
@@ -109,7 +104,8 @@ public class AuthorizationServerConfig {
 			.clientSecret(passwordEncoder().encode(clientSecret))
 			.scope("read")
 			.scope("write")
-			.authorizationGrantType(new AuthorizationGrantType("password"))
+			.authorizationGrantType(AuthorizationGrantType.PASSWORD)
+			.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 			.tokenSettings(tokenSettings())
 			.clientSettings(clientSettings())
 			.build();
@@ -124,6 +120,8 @@ public class AuthorizationServerConfig {
 		return TokenSettings.builder()
 			.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
 			.accessTokenTimeToLive(Duration.ofSeconds(jwtDurationSeconds))
+			.refreshTokenTimeToLive(Duration.ofDays(14))
+			.reuseRefreshTokens(false)  //significa refresh token rotativo (mais seguro).
 			.build();
 		// @formatter:on
 	}
@@ -144,7 +142,13 @@ public class AuthorizationServerConfig {
 		JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
 		jwtGenerator.setJwtCustomizer(tokenCustomizer());
 		OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
-		return new DelegatingOAuth2TokenGenerator(jwtGenerator, accessTokenGenerator);
+		OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator(); // <-- FALTAVA
+
+		return new DelegatingOAuth2TokenGenerator(
+				jwtGenerator,             // gera JWT para access token
+				accessTokenGenerator,     // fallback para tokens opacos
+				refreshTokenGenerator     // <-- ESSENCIAL para gerar refresh token
+		);
 	}
 
 	@Bean

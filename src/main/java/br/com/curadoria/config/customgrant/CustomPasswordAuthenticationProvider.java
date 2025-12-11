@@ -14,13 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClaimAccessor;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.core.OAuth2Token;
+import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -127,11 +121,28 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		} else {
 			authorizationBuilder.accessToken(accessToken);
 		}
+
+		//-----------REFRESH TOKEN----------
+		OAuth2TokenContext refreshTokenContext = tokenContextBuilder
+				.tokenType(OAuth2TokenType.REFRESH_TOKEN)
+				.build();
+
+		OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(refreshTokenContext);
+		if (generatedRefreshToken == null) {
+			OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
+					"The token generator failed to generate the refresh token.", ERROR_URI);
+			throw new OAuth2AuthenticationException(error);
+		}
+
+		OAuth2RefreshToken refreshToken = (OAuth2RefreshToken) generatedRefreshToken;
+
+		// Armazena o refresh token na autorização
+		authorizationBuilder.refreshToken(refreshToken);
 				
 		OAuth2Authorization authorization = authorizationBuilder.build();
 		this.authorizationService.save(authorization);
 		
-		return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken);
+		return new OAuth2AccessTokenAuthenticationToken(registeredClient, clientPrincipal, accessToken, refreshToken);
 	}
 
 	@Override
