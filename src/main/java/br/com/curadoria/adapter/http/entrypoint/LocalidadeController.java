@@ -44,9 +44,21 @@ public class LocalidadeController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
+    @PostMapping("/municipio_nacional")
+    public ResponseEntity<Void> postMunicipioNacional(@RequestBody @Valid MunicipioDTO municipioDTO) {
+        serviceMunicipio.postMunicipioNacional(municipioDTO);
+        return new ResponseEntity(HttpStatus.CREATED);
+    }
+
     @PutMapping("/municipio_internacional")
     public ResponseEntity<Void> putMunicipioInternacional(@RequestBody @Valid MunicipioDTO municipioDTO) {
         serviceMunicipio.putMunicipioInternacional(municipioDTO);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/municipio_nacional")
+    public ResponseEntity<Void> putMunicipioNacional(@RequestBody @Valid MunicipioDTO municipioDTO) {
+        serviceMunicipio.putMunicipioNacional(municipioDTO);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

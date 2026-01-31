@@ -26,4 +26,7 @@ public class MunicipioDTO {
 
     @JsonProperty("id_estado")
     private Integer idEstado;
+
+    @JsonProperty("capital")
+    private Boolean capital;
 }

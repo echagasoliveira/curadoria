@@ -1,9 +1,11 @@
 package br.com.curadoria.core.services;
 
 import br.com.curadoria.adapter.http.dto.MunicipioDTO;
+import br.com.curadoria.core.entities.Estado;
 import br.com.curadoria.core.entities.HotelNacional;
 import br.com.curadoria.core.entities.Municipio;
 import br.com.curadoria.core.entities.Pais;
+import br.com.curadoria.core.ports.repositories.EstadoRepository;
 import br.com.curadoria.core.ports.repositories.MunicipioRepository;
 import br.com.curadoria.core.ports.repositories.PaisRepository;
 import br.com.curadoria.core.services.mapper.MunicipioMapper;
@@ -24,6 +26,9 @@ public class MunicipioService {
 
     @Autowired
     private PaisRepository paisRepository;
+
+    @Autowired
+    private EstadoRepository estadoRepository;
 
     @Autowired
     private MunicipioMapper mapper;
@@ -54,8 +59,42 @@ public class MunicipioService {
         Municipio municipio = Municipio.builder()
                 .pais(optionalPais.get())
                 .nome(municipioDTO.getNome())
+                .capital(municipioDTO.getCapital())
+                .build();
+        municipioRepository.save(municipio);
+    }
+
+    public void postMunicipioNacional(MunicipioDTO municipioDTO){
+        Optional<Estado> optionalEstado = estadoRepository.findById(Long.valueOf(municipioDTO.getIdEstado()));
+        Optional<Pais> optionalPais = paisRepository.findById(MunicipioService.ID_BRASIL);
+
+        if(!optionalEstado.isPresent() || !optionalPais.isPresent())
+            throw new RuntimeException("País ou estado não encontrado. Favor tentar novamente mais tarde.");
+
+        Municipio municipio = Municipio.builder()
+                .pais(optionalPais.get())
+                .estado(optionalEstado.get())
+                .nome(municipioDTO.getNome())
                 .capital(false)
                 .build();
+        municipioRepository.save(municipio);
+    }
+
+    public void putMunicipioNacional(MunicipioDTO municipioDTO){
+        Optional<Estado> optionalEstado = estadoRepository.findById(Long.valueOf(municipioDTO.getIdEstado()));
+        Optional<Pais> optionalPais = paisRepository.findById(MunicipioService.ID_BRASIL);
+
+        if(!optionalEstado.isPresent() || !optionalPais.isPresent())
+            throw new RuntimeException("País ou estado não encontrado. Favor tentar novamente mais tarde.");
+
+        Municipio municipio = municipioRepository.findById(municipioDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Município não encontrado. Favor tentar novamente mais tarde."));
+
+        municipio.setPais(optionalPais.get());
+        municipio.setEstado(optionalEstado.get());
+        municipio.setNome(municipioDTO.getNome());
+        municipio.setCapital(municipioDTO.getCapital());
+
         municipioRepository.save(municipio);
     }
 
@@ -70,7 +109,7 @@ public class MunicipioService {
 
         municipio.setPais(optionalPais.get());
         municipio.setNome(municipioDTO.getNome());
-        municipio.setCapital(false);
+        municipio.setCapital(municipioDTO.getCapital());
 
         municipioRepository.save(municipio);
     }
