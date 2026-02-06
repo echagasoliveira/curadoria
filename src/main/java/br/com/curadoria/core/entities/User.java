@@ -1,10 +1,8 @@
 package br.com.curadoria.core.entities;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +26,9 @@ public class User implements UserDetails, Serializable {
 	private String password;
     @Column(unique = true)
 	private String email;
+
+	@Column(unique = true)
+	private Date dataExpiracaoAssinatura;
 
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tb_user_role",

@@ -100,6 +100,7 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.withRegisteredClient(registeredClient)
 				.attribute(Principal.class.getName(), clientPrincipal)
 				.principalName(clientPrincipal.getName())
+				.attribute("username", username)
 				.authorizationGrantType(((CustomPasswordAuthenticationToken) authentication).getGrantType()	)
 				.authorizedScopes(authorizedScopes);
 		

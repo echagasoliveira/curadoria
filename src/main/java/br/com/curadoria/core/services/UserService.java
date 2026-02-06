@@ -15,10 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +50,12 @@ public class UserService implements UserDetailsService {
 		if (result.isEmpty())
 			throw new UsernameNotFoundException("Email não encontrado.");
 
+		Date dataExpiracao = result.get(0).getDataExpiracaoAssinatura();
+		Date hoje = new Date();
+		if(dataExpiracao == null || hoje.after(dataExpiracao))
+			throw new OAuth2AuthenticationException(
+				new OAuth2Error("invalid_request","Data de assinatura expirada",null)
+			);
 		User user = new User();
 		user.setEmail(result.get(0).getUsername());
 		user.setPassword(result.get(0).getPassword());
