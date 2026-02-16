@@ -5,6 +5,7 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -187,11 +188,21 @@ public class AuthorizationServerConfig {
 			CustomUserAuthorities user = (CustomUserAuthorities) principal.getDetails();
 			List<String> authorities = user.getAuthorities().stream().map(x -> x.getAuthority()).toList();
 			if (context.getTokenType().getValue().equals("access_token")) {
-				// @formatter:off
 				context.getClaims()
 					.claim("authorities", authorities)
 					.claim("username", user.getUsername());
-				// @formatter:on
+			}
+
+			// Plano de assinatura
+			Date dataExpiracao = user.getSubscriptionExpiresAt();
+			boolean expired = (dataExpiracao == null || new Date().after(dataExpiracao));
+
+			context.getClaims()
+					.claim("subscription_status", expired ? "expired" : "active");
+
+			if (dataExpiracao != null) {
+				context.getClaims()
+						.claim("subscription_expires_at", dataExpiracao.toInstant().getEpochSecond());
 			}
 		};
 	}

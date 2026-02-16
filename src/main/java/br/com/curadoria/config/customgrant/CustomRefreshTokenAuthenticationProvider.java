@@ -57,15 +57,6 @@ public class CustomRefreshTokenAuthenticationProvider
             );
         }
 
-        String username = authorization.getAttribute("username");
-        List<UserDetailsProjection> result = repository.searchUserAndRolesByEmail(username);
-        Date dataExpiracao = result.get(0).getDataExpiracaoAssinatura();
-        Date hoje = new Date();
-        if(dataExpiracao == null || hoje.after(dataExpiracao))
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("invalid_request","Data de assinatura expirada",null)
-            );
-
         return delegate.authenticate(authentication);
     }
 

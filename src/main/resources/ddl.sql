@@ -17,9 +17,10 @@ drop table tb_user;
 -- Usuários
 CREATE TABLE tb_user (
     id char(37) PRIMARY KEY,
+    apple_user_id INT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-	data_expiracao_assinatura date NULL
+	data_expiracao_assinatura DATE NULL
 );
 
 --alter table tb_user add data_expiracao_assinatura date NULL;

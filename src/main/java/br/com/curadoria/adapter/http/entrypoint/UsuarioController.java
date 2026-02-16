@@ -1,8 +1,10 @@
 package br.com.curadoria.adapter.http.entrypoint;
 
 import br.com.curadoria.adapter.http.dto.UserDTO;
+import br.com.curadoria.adapter.http.dto.PlanoAssinaturaDTO;
 import br.com.curadoria.adapter.http.dto.response.RestResult;
 import br.com.curadoria.core.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -31,5 +33,12 @@ public class UsuarioController {
     public ResponseEntity<Void> postLoja(@RequestBody @NotEmpty @Valid UserDTO dto) {
         service.postLoja(dto);
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "/efetivar_plano_assinatura",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Void> postEfetivarPlanoAssinatura(@RequestBody @NotEmpty @Valid PlanoAssinaturaDTO dto) throws JsonProcessingException {
+        service.postEfetivarPlanoAssinatura(dto);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

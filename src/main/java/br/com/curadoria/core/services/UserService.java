@@ -1,15 +1,21 @@
 package br.com.curadoria.core.services;
 
+import br.com.curadoria.adapter.http.dto.PlanoAssinaturaDTO;
 import br.com.curadoria.adapter.http.dto.UserDTO;
 import br.com.curadoria.core.entities.*;
 import br.com.curadoria.core.ports.projections.UserDetailsProjection;
 import br.com.curadoria.core.ports.repositories.*;
 import br.com.curadoria.core.services.helpers.ValidadorEmailHelper;
 import br.com.curadoria.core.services.mapper.UserMapper;
+import com.amazonaws.services.pinpoint.model.BadRequestException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,11 +26,13 @@ import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +50,9 @@ public class UserService implements UserDetailsService {
 	private SenhaService senhaService;
 
 	@Autowired
+	private AppleService appleService;
+
+	@Autowired
 	private UserMapper mapper;
 
 	@Override
@@ -51,18 +62,16 @@ public class UserService implements UserDetailsService {
 			throw new UsernameNotFoundException("Email não encontrado.");
 
 		Date dataExpiracao = result.get(0).getDataExpiracaoAssinatura();
-		Date hoje = new Date();
-		if(dataExpiracao == null || hoje.after(dataExpiracao))
-			throw new OAuth2AuthenticationException(
-				new OAuth2Error("invalid_request","Data de assinatura expirada",null)
-			);
-		User user = new User();
-		user.setEmail(result.get(0).getUsername());
-		user.setPassword(result.get(0).getPassword());
-		for (UserDetailsProjection projection : result)
-			user.addRole(new Role(projection.getRoleId(), projection.getAuthority()));
+		List<GrantedAuthority> authorities = result.stream()
+				.map(p -> new SimpleGrantedAuthority(p.getAuthority()))
+				.collect(Collectors.toList());
 
-		return user;
+		return new CustomUserDetails(
+				result.get(0).getUsername(),
+				result.get(0).getPassword(),
+				authorities,
+				dataExpiracao
+		);
 	}
 
 	public User authenticated() {
@@ -100,5 +109,12 @@ public class UserService implements UserDetailsService {
 
 		entity = repository.save(entity);
 		return mapper.map(entity);
+	}
+
+	public void postEfetivarPlanoAssinatura(PlanoAssinaturaDTO dto) throws JsonProcessingException {
+		if(appleService.validaReciboApple(dto.getAppleUserId(), dto.getReceipt()))
+			repository.atualizaPlanoAssinatura(dto.getUserId(), dto.getQtdDias(), dto.getAppleUserId());
+		else
+			throw new BadRequestException("Plano de assinatura não validado.");
 	}
 }

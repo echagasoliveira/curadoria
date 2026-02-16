@@ -23,6 +23,7 @@ public class User implements UserDetails, Serializable {
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+	private Integer apple_user_id;
 	private String password;
     @Column(unique = true)
 	private String email;
