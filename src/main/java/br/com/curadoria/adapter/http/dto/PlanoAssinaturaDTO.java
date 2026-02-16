@@ -14,9 +14,6 @@ public class PlanoAssinaturaDTO {
     @JsonProperty("user_id")
 	private String userId;
 
-	@JsonProperty("qtd_dias")
-	private Integer qtdDias;
-
 	@JsonProperty("apple_user_id")
 	private Integer appleUserId;
 

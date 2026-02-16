@@ -1,5 +1,6 @@
 package br.com.curadoria.core.services;
 
+import br.com.curadoria.adapter.http.dto.AppleReceiptRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,17 +25,15 @@ public class AppleService {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public Boolean validaReciboApple(Integer appleUserId, String receipt) throws JsonProcessingException {
-		String requestJson = """
-            {
-                "receipt-data": "%s",
-                "password": "%s",
-                "exclude-old-transactions": true
-            }
-            """.formatted(receipt, sharedSecret);
+	public Long validaReciboApple(Integer appleUserId, String receipt) throws JsonProcessingException {
+		AppleReceiptRequest request = new AppleReceiptRequest();
+		request.setReceiptData(receipt);
+		request.setPassword(sharedSecret);
+		request.setExcludeOldTransactions(true);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
+		String requestJson = mapper.writeValueAsString(request);
 
 		HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
@@ -50,7 +49,7 @@ public class AppleService {
 
 		// 🔹 3 - Se status diferente de 0, inválido
 		if (json.get("status").asInt() != 0) {
-			return false;
+			return 0L;
 		}
 
 		// 🔹 4 - Verifica expiração da assinatura
@@ -63,9 +62,9 @@ public class AppleService {
 
 			long now = System.currentTimeMillis();
 
-			return expiresDateMs > now;
+			return expiresDateMs;
 		}
 
-		return false;
+		return 0L;
 	}
 }

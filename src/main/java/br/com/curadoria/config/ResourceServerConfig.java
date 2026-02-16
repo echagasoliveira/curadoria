@@ -52,6 +52,7 @@ public class ResourceServerConfig {
 
 		http.csrf(csrf -> csrf.disable());
 		http.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/usuario/efetivar_plano_assinatura").permitAll()
 				.anyRequest().access((authenticationSupplier, context) -> {
 					var authentication = authenticationSupplier.get();
 					if (authentication != null && authentication.getAuthorities().stream()

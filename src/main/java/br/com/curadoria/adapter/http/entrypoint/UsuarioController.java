@@ -36,8 +36,8 @@ public class UsuarioController {
     }
 
     @PostMapping(path = "/efetivar_plano_assinatura",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> postEfetivarPlanoAssinatura(@RequestBody @NotEmpty @Valid PlanoAssinaturaDTO dto) throws JsonProcessingException {
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> postEfetivarPlanoAssinatura(@RequestBody @Valid PlanoAssinaturaDTO dto) throws JsonProcessingException {
         service.postEfetivarPlanoAssinatura(dto);
         return new ResponseEntity(HttpStatus.OK);
     }

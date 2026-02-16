@@ -5,6 +5,7 @@ import br.com.curadoria.adapter.http.dto.UserDTO;
 import br.com.curadoria.core.entities.*;
 import br.com.curadoria.core.ports.projections.UserDetailsProjection;
 import br.com.curadoria.core.ports.repositories.*;
+import br.com.curadoria.core.services.exceptions.MensagemException;
 import br.com.curadoria.core.services.helpers.ValidadorEmailHelper;
 import br.com.curadoria.core.services.mapper.UserMapper;
 import com.amazonaws.services.pinpoint.model.BadRequestException;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -112,9 +114,13 @@ public class UserService implements UserDetailsService {
 	}
 
 	public void postEfetivarPlanoAssinatura(PlanoAssinaturaDTO dto) throws JsonProcessingException {
-		if(appleService.validaReciboApple(dto.getAppleUserId(), dto.getReceipt()))
-			repository.atualizaPlanoAssinatura(dto.getUserId(), dto.getQtdDias(), dto.getAppleUserId());
+		Long tempoExpiracao = appleService.validaReciboApple(dto.getAppleUserId(), dto.getReceipt());
+		if(tempoExpiracao > 0) {
+			long umDiaEmMs = 1000L * 60 * 60 * 24;
+			long qtdDias = (long) Math.ceil((double) tempoExpiracao / umDiaEmMs);
+			repository.atualizaPlanoAssinatura(dto.getUserId(), qtdDias, dto.getAppleUserId());
+		}
 		else
-			throw new BadRequestException("Plano de assinatura não validado.");
+			throw new MensagemException("Plano de assinatura não validado.", HttpStatus.BAD_REQUEST);
 	}
 }

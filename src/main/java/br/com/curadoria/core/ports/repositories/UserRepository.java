@@ -26,5 +26,5 @@ public interface UserRepository extends JpaRepository<User, String> {
 				SET apple_user_id = ?3, data_expiracao_assinatura = DATE_ADD(CURDATE(), INTERVAL ?2 DAY)
 				WHERE user_id = ?1
 			""")
-	void atualizaPlanoAssinatura(String userId, Integer qtdDias, Integer appleUserId);
+	void atualizaPlanoAssinatura(String userId, Long qtdDias, Integer appleUserId);
 }
