@@ -46,7 +46,6 @@ public class AppleService {
 		);
 
 		JsonNode json = mapper.readTree(response.getBody());
-
 		// 🔹 3 - Se status diferente de 0, inválido
 		if (json.get("status").asInt() != 0) {
 			return 0L;
@@ -59,8 +58,6 @@ public class AppleService {
 
 			JsonNode lastTransaction = latestReceipt.get(latestReceipt.size() - 1);
 			long expiresDateMs = lastTransaction.get("expires_date_ms").asLong();
-
-			long now = System.currentTimeMillis();
 
 			return expiresDateMs;
 		}
