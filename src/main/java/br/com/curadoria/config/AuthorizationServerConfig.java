@@ -5,12 +5,15 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import br.com.curadoria.config.customgrant.CustomPasswordAuthenticationConverter;
 import br.com.curadoria.config.customgrant.CustomPasswordAuthenticationProvider;
+import br.com.curadoria.config.customgrant.CustomRefreshTokenAuthenticationProvider;
 import br.com.curadoria.config.customgrant.CustomUserAuthorities;
+import br.com.curadoria.core.ports.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +33,7 @@ import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2Au
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -62,6 +66,10 @@ public class AuthorizationServerConfig {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Autowired
+	private UserRepository userRepository;
+
+
 	@Bean
 	@Order(2)
 	public SecurityFilterChain asSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -72,7 +80,29 @@ public class AuthorizationServerConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 			.tokenEndpoint(tokenEndpoint -> tokenEndpoint
 				.accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
-				.authenticationProvider(new CustomPasswordAuthenticationProvider(authorizationService(), tokenGenerator(), userDetailsService, passwordEncoder())));
+					.authenticationProviders(providers -> {
+						providers.removeIf(p ->
+								p instanceof OAuth2RefreshTokenAuthenticationProvider
+						);
+						// refresh_token grant
+						providers.add(
+								new CustomRefreshTokenAuthenticationProvider(
+										authorizationService(),
+										tokenGenerator(),
+										userRepository
+								)
+						);
+						// password grant
+						providers.add(
+								new CustomPasswordAuthenticationProvider(
+										authorizationService(),
+										tokenGenerator(),
+										userDetailsService,
+										passwordEncoder()
+								)
+						);
+
+					}));
 
 		http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
 		// @formatter:on
@@ -120,7 +150,7 @@ public class AuthorizationServerConfig {
 		return TokenSettings.builder()
 			.accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
 			.accessTokenTimeToLive(Duration.ofSeconds(jwtDurationSeconds))
-			.refreshTokenTimeToLive(Duration.ofDays(14))
+			.refreshTokenTimeToLive(Duration.ofDays(30))
 			.reuseRefreshTokens(false)  //significa refresh token rotativo (mais seguro).
 			.build();
 		// @formatter:on
@@ -142,7 +172,7 @@ public class AuthorizationServerConfig {
 		JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
 		jwtGenerator.setJwtCustomizer(tokenCustomizer());
 		OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
-		OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator(); // <-- FALTAVA
+		OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
 
 		return new DelegatingOAuth2TokenGenerator(
 				jwtGenerator,             // gera JWT para access token
@@ -158,11 +188,21 @@ public class AuthorizationServerConfig {
 			CustomUserAuthorities user = (CustomUserAuthorities) principal.getDetails();
 			List<String> authorities = user.getAuthorities().stream().map(x -> x.getAuthority()).toList();
 			if (context.getTokenType().getValue().equals("access_token")) {
-				// @formatter:off
 				context.getClaims()
 					.claim("authorities", authorities)
 					.claim("username", user.getUsername());
-				// @formatter:on
+			}
+
+			// Plano de assinatura
+			Date dataExpiracao = user.getSubscriptionExpiresAt();
+			boolean expired = (dataExpiracao == null || new Date().after(dataExpiracao));
+
+			context.getClaims()
+					.claim("subscription_status", expired ? "expired" : "active");
+
+			if (dataExpiracao != null) {
+				context.getClaims()
+						.claim("subscription_expires_at", dataExpiracao.toInstant().getEpochSecond());
 			}
 		};
 	}

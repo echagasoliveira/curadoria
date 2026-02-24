@@ -1,10 +1,10 @@
 package br.com.curadoria.config.customgrant;
 
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import br.com.curadoria.core.entities.CustomUserDetails;
 import br.com.curadoria.core.entities.User;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -78,10 +78,13 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 				.map(scope -> scope.getAuthority())
 				.filter(scope -> registeredClient.getScopes().contains(scope))
 				.collect(Collectors.toSet());
-		
+
+		//-----------Plano de assinatura----
+		Date dataExpiracao = new Date(((CustomUserDetails) user).getSubscriptionExpiresAt().getTime());
+
 		//-----------Create a new Security Context Holder Context----------
 		OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = (OAuth2ClientAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-		CustomUserAuthorities customPasswordUser = new CustomUserAuthorities(username, user.getAuthorities());
+		CustomUserAuthorities customPasswordUser = new CustomUserAuthorities(username, user.getAuthorities(), dataExpiracao);
 		oAuth2ClientAuthenticationToken.setDetails(customPasswordUser);
 		
 		var newcontext = SecurityContextHolder.createEmptyContext();
@@ -100,6 +103,7 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.withRegisteredClient(registeredClient)
 				.attribute(Principal.class.getName(), clientPrincipal)
 				.principalName(clientPrincipal.getName())
+				.attribute("username", username)
 				.authorizationGrantType(((CustomPasswordAuthenticationToken) authentication).getGrantType()	)
 				.authorizedScopes(authorizedScopes);
 		
