@@ -80,7 +80,11 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 				.collect(Collectors.toSet());
 
 		//-----------Plano de assinatura----
-		Date dataExpiracao = new Date(((CustomUserDetails) user).getSubscriptionExpiresAt().getTime());
+		Date subscriptionExpiresAt = ((CustomUserDetails) user).getSubscriptionExpiresAt();
+		LocalDate ontem = LocalDate.now().minusDays(1);
+		Date dataExpiracao = subscriptionExpiresAt != null ? new Date(subscriptionExpiresAt.getTime()) : Date.from(
+			ontem.atStartOfDay(ZoneId.systemDefault()).toInstant()
+		);
 
 		//-----------Create a new Security Context Holder Context----------
 		OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = (OAuth2ClientAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
