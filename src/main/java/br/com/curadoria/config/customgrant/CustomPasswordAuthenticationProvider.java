@@ -85,7 +85,7 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		LocalDate ontem = LocalDate.now().minusDays(1);
 		Date dataExpiracao = subscriptionExpiresAt != null ? new Date(subscriptionExpiresAt.getTime()) : Date.from(
 				ontem.atStartOfDay(ZoneId.systemDefault()).toInstant()
-		);
+		); 
 
 		//-----------Create a new Security Context Holder Context----------
 		OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = (OAuth2ClientAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
