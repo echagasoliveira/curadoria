@@ -25,7 +25,7 @@ public class AppleService {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public Long validaReciboApple(Integer appleUserId, String receipt) throws JsonProcessingException {
+	public Long validaReciboApple(String appleUserId, String receipt) throws JsonProcessingException {
 		AppleReceiptRequest request = new AppleReceiptRequest();
 		request.setReceiptData(receipt);
 		request.setPassword(sharedSecret);
