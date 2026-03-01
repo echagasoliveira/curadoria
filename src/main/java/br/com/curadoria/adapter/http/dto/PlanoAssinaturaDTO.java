@@ -15,7 +15,7 @@ public class PlanoAssinaturaDTO {
 	private String userId;
 
 	@JsonProperty("apple_user_id")
-	private Integer appleUserId;
+	private String appleUserId;
 
 	@JsonProperty("receipt")
 	private String receipt;
