@@ -41,7 +41,7 @@ public class AppleService {
 
 		HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-		LOGGER.warn("receipt: "+ receipt);
+		LOGGER.error("receipt: "+ receipt);
 		// 🔹 1 - Chama url da apple
 		ResponseEntity<String> response = restTemplate.exchange(
 				url,
