@@ -2,14 +2,17 @@ package br.com.curadoria.config;
 
 import java.util.Arrays;
 
+import br.com.curadoria.config.customgrant.CustomJwtAuthenticationConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,10 +51,31 @@ public class ResourceServerConfig {
 	public SecurityFilterChain rsSecurityFilterChain(HttpSecurity http) throws Exception {
 
 		http.csrf(csrf -> csrf.disable());
-		http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll());
-		http.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
+		http.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/usuario/efetivar_plano_assinatura").permitAll()
+				.anyRequest().access((authenticationSupplier, context) -> {
+					var authentication = authenticationSupplier.get();
+					if (authentication != null && authentication.getAuthorities().stream()
+							.anyMatch(a -> a.getAuthority().equals("SUBSCRIPTION_EXPIRED"))) {
+						return new AuthorizationDecision(false);
+					}
+					return new AuthorizationDecision(true);
+				})
+		);
+
+		http.oauth2ResourceServer(oauth2 -> oauth2
+				.jwt(jwt -> jwt
+						.jwtAuthenticationConverter(customJwtAuthenticationConverter())
+				)
+		);
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 		return http.build();
+	}
+
+	@Bean
+	@Primary
+	public CustomJwtAuthenticationConverter customJwtAuthenticationConverter() {
+		return new CustomJwtAuthenticationConverter();
 	}
 
 	@Bean
