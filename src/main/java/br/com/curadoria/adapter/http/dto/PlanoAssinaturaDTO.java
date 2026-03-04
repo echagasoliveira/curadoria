@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlanoAssinaturaDTO {
     @JsonProperty("user_id")
-	private String userId;
+	private String userId; 
 
 	@JsonProperty("apple_user_id")
-	private String appleUserId;
+	private String appleUserId; // atualizado
 
 	@JsonProperty("receipt")
 	private String receipt;
