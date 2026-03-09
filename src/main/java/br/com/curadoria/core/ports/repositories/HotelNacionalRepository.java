@@ -16,6 +16,7 @@ public interface HotelNacionalRepository extends JpaRepository<HotelNacional, In
                             AND   (hnr.id_regime_alimentacao = ?3 or ?3 is null)
                             AND   (hn.palavras_chave like %?4% or ?4 is null)
                             AND   hn.ativo = true
+                        ORDER BY hn.nome
                    """)
     List<HotelNacional> searchHoteisNacionais(Integer idEstado, Integer idMunicipio, Integer idRegimeAlimentacao, String palavraChave);
 }
