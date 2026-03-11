@@ -72,8 +72,10 @@ public class AppleService {
 
 			JsonNode lastTransaction = latestReceipt.get(latestReceipt.size() - 1);
 			long expiresDateMs = lastTransaction.get("expires_date_ms").asLong();
+			long now = System.currentTimeMillis();
 
-			return expiresDateMs;
+			long remainingTime = expiresDateMs - now;
+			return remainingTime;
 		}
 		LOGGER.error("receipt: "+ receipt);
 		return 0L;
