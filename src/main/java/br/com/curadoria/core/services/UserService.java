@@ -116,9 +116,7 @@ public class UserService implements UserDetailsService {
 	public void postEfetivarPlanoAssinatura(PlanoAssinaturaDTO dto) throws JsonProcessingException {
 		Long tempoExpiracao = appleService.validaReciboApple(dto.getAppleUserId(), dto.getReceipt());
 		if(tempoExpiracao > 0) {
-			long umDiaEmMs = 1000L * 60 * 60 * 24;
-			long qtdDias = (long) Math.ceil((double) tempoExpiracao / umDiaEmMs);
-			repository.atualizaPlanoAssinatura(dto.getUserId(), qtdDias, dto.getAppleUserId());
+			repository.atualizaPlanoAssinatura(dto.getUserId(), tempoExpiracao, dto.getAppleUserId());
 		}
 		else
 			throw new MensagemException("Plano de assinatura não validado.", HttpStatus.BAD_REQUEST);
