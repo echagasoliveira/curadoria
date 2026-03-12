@@ -23,8 +23,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	@Query(nativeQuery = true, value = """
 				UPDATE tb_user
-				SET apple_user_id = ?3, data_expiracao_assinatura = DATE_ADD(CURDATE(), INTERVAL ?2 DAY)
+				SET apple_user_id = ?3, data_expiracao_assinatura = FROM_UNIXTIME(?2 / 1000)
 				WHERE email = ?1
 			""")
-	void atualizaPlanoAssinatura(String userId, Long qtdDias, String appleUserId);
+	void atualizaPlanoAssinatura(String userId, Long tempoExpiracao, String appleUserId);
 }
