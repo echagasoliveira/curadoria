@@ -109,14 +109,17 @@ public class AppleService {
 			// payload
 			String payload = jwsObject.getPayload().toString();
 			JsonNode json = mapper.readTree(payload);
-			LOGGER.info("Apple payload: {}", json);
-
-			if (json.has("expiresDate"))
+			LOGGER.info("Apple payload: "+json);
+			LOGGER.error("jwsReceipt: "+ jwsReceipt);
+			
+			if (json.has("expiresDate")) {
+				LOGGER.info("expiresDate: "+json.get("expiresDate").asLong());
 				return json.get("expiresDate").asLong();
-
-			if (json.has("expiresDateMs"))
+			}
+			if (json.has("expiresDateMs")) {
+				LOGGER.info("expiresDateMs: "+json.get("expiresDateMs").asLong());
 				return json.get("expiresDateMs").asLong();
-
+			}
 			LOGGER.error("jwsReceipt: "+ jwsReceipt + " expiresDateMs: "+json.get("expiresDateMs").asInt());
 			return 0L;
 
